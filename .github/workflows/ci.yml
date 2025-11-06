@@ -7,7 +7,7 @@ on:
 env:
   TARGET_REPO: red55/cache-docker-images-action   # change to target owner/repo
   TARGET_BRANCH: main              # target branch to push to
-  PAT: ${{ secrets.GITHUB_TOKEN }} # create a PAT with repo scope and add to secrets
+  PAT: ${{ secrets.TARGET_PAT }} # create a PAT with repo scope and add to secrets
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
           git remote add target "https://x-access-token:${PAT}@github.com/${TARGET_REPO}.git"
       - name: Build project
         run: bun run build
-      - name: Push to another repository
+      - name: Push to ${{ env.TARGET_REPO }} repository
         run: |
           set -e -u -o pipefail
           cd dist
@@ -40,8 +40,6 @@ jobs:
           git commit -m "Deploy to GitHub Packages $GITHUB_SHA by $GITHUB_ACTOR"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          BRANCH=${GITHUB_REF##*/}
-
 
           # push current branch to target branch
           git push --force target "HEAD:refs/heads/${TARGET_BRANCH}"
