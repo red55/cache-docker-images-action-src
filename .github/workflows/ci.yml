@@ -36,6 +36,8 @@ jobs:
         run: |
           set -e -u -o pipefail
           cd dist
+          cp ../main.js ./
+          cp ../post.js ./
           git add .
           git commit -m "Deploy to GitHub Packages $GITHUB_SHA by $GITHUB_ACTOR"
           git config user.name "github-actions[bot]"
