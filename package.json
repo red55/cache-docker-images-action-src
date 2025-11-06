@@ -10,8 +10,8 @@
   },
   "scripts": {
     "build": "bun run build:main && bun run build:post",
-    "build:main": "bun build --production --target=node --outfile=main.js ./main.ts",
-    "build:post": "bun build --production --target=node --outfile=post.js ./post.ts",
+    "build:main": "bun build --production --target=node --out=dist/ ./main.ts",
+    "build:post": "bun build --production --target=node --out=dist/ ./post.ts",
     "clean": "rm -rf ./dist"
   },
   "peerDependencies": {
