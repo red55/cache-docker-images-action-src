@@ -1,0 +1,46 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+
+env:
+  TARGET_REPO: red55/docker-images-action   # change to target owner/repo
+  TARGET_BRANCH: main              # target branch to push to
+  PAT: ${{ secrets.GITHUB_TOKEN }} # create a PAT with repo scope and add to secrets
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Bun
+        uses: oven-sh/bun@v1
+        with:
+          version: 'latest'
+      - name: Install dependencies
+        run: bun install
+      - name: Build project
+        run: bun run build
+      - name: Prepare dist folder
+        run: |
+          mkdir dist
+          cp action.yml dist/
+          git init
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # add target remote using PAT; using x-access-token is common and safe here
+          git remote add target "https://x-access-token:${PAT}@github.com/${TARGET_REPO}.git"
+      - name: Push to another repository
+        run: |
+          set -e -u -o pipefail
+          cd dist
+          git add .
+          git commit -m "Deploy to GitHub Packages $GITHUB_SHA by $GITHUB_ACTOR"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH=${GITHUB_REF##*/}
+
+
+          # push current branch to target branch
+          git push --force target "HEAD:refs/heads/${TARGET_BRANCH}"

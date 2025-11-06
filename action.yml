@@ -1,0 +1,25 @@
+name: Cache Docker Images
+author: Leonid Korokh
+description: Cache Docker images whether built or pulled.
+branding:
+  icon: download
+  color: blue
+inputs:
+  key:
+    description: >
+      The cache key
+    required: true
+  read-only:
+    description: If "true", disables saving the cache upon cache miss
+    required: false
+    default: "false"
+outputs:
+  cache-hit:
+    description: >
+      The ferried output of the official GitHub cache action. True on cache hit
+      (even if the subsequent docker load failed) and false on cache miss.
+runs:
+  using: node20
+  main: dist/main.js
+  post-if: success()
+  post: dist/post.js

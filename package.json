@@ -1,0 +1,25 @@
+{
+  "name": "cache-docker-images-action",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "target": "node",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/dockerode": "^3.3.45"
+  },
+  "scripts": {
+    "build": "bun run build:main && bun run build:post",
+    "build:main": "bun build --production --target=node --outfile=./dist/main.js ./main.ts",
+    "build:post": "bun build --production --target=node --outfile=./dist/post.js ./post.ts",
+    "clean": "rm -rf ./dist"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@actions/cache": "^4.1.0",
+    "@actions/core": "^1.11.1",
+    "dockerode": "^4.0.9"
+  }
+}

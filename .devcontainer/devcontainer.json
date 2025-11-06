@@ -1,0 +1,80 @@
+{
+  "name": "Bun",
+
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "installOhMyZshConfig": true,
+      "upgradePackages": true,
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "installDirectlyFromGitHubRelease": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/alertbox/oven-sh/bun:1": {
+      "version": "latest"
+    },
+    "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {
+      "setLocale": true,
+      "theme": "bira",
+      "plugins": "git docker bun",
+      "desiredLocale": "en_US.UTF-8 UTF-8"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "os-provided"
+    }
+  },
+  "remoteEnv": {
+    "PATH": "/home/vscode/.bun/bin:${containerEnv:PATH}"
+  },
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        // TypeScript
+        "bierner.lit-html",
+        "better-ts-errors.better-ts-errors",
+        // Makefile
+        "ms-vscode.makefile-tools",
+        // Markdown
+        "bierner.markdown-preview-github-styles",
+        "bierner.markdown-emoji",
+        "bierner.markdown-checkbox",
+        "bierner.jsdoc-markdown-highlighting",
+        "ms-vscode.wordcount",
+        // Other
+        "albert.tabout",
+        "streetsidesoftware.code-spell-checker",
+        "bierner.comment-tagged-templates",
+        "github.vscode-github-actions"
+      ],
+      // Set *default* container specific settings.json values on container create.
+      "settings": {
+        "debug.internalConsoleOptions": "neverOpen",
+        "editor.guides.bracketPairs": "active",
+        "diffEditor.diffAlgorithm": "advanced",
+        "diffEditor.experimental.showMoves": true,
+        "diffEditor.renderSideBySide": false,
+        "files.watcherExclude": {
+          "**/node_modules/**": true
+        },
+        // Prettifies the response with emojis and such.
+        "betterTypeScriptErrors.prettify": true,
+        "scm.defaultViewMode": "tree",
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  },
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": {
+    "restore": "bun run clean && bun install"
+  }
+}
