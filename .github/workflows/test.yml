@@ -1,0 +1,14 @@
+name: Test
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache Docker images.
+        uses: red55/cache-docker-images-action@main
+        with:
+          key: cache-docker-images-test-${{ runner.os }}
+      - name: Pull a test image
+        run: docker pull alpine:latest
