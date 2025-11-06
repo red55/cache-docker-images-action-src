@@ -5,7 +5,7 @@ on:
       - main
 
 env:
-  TARGET_REPO: red55/docker-images-action   # change to target owner/repo
+  TARGET_REPO: red55/cache-docker-images-action   # change to target owner/repo
   TARGET_BRANCH: main              # target branch to push to
   PAT: ${{ secrets.GITHUB_TOKEN }} # create a PAT with repo scope and add to secrets
 
