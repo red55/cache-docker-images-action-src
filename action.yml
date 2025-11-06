@@ -20,6 +20,6 @@ outputs:
       (even if the subsequent docker load failed) and false on cache miss.
 runs:
   using: node20
-  main: dist/main.js
+  main: main.js
   post-if: success()
-  post: dist/post.js
+  post: post.js
