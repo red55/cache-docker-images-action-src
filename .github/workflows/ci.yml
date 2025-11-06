@@ -23,7 +23,7 @@ jobs:
         run: bun install
       - name: Prepare dist folder
         run: |
-          mkdir dist
+          mkdir dist || true
           cd dist
           cp ../action.yml ./
           git init
