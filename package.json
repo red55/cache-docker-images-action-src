@@ -12,7 +12,8 @@
     "build": "bun run build:main && bun run build:post",
     "build:main": "bun build --minify --target=node --outdir=dist/ ./main.ts",
     "build:post": "bun build --minify --target=node --outdir=dist/ ./post.ts",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist",
+    "test": "bun test --timeout 60000"
   },
   "peerDependencies": {
     "typescript": "^5"
