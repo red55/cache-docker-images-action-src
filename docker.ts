@@ -1,10 +1,11 @@
-import { getInput, getState, info, saveState, setOutput } from "@actions/core";
+import { getInput, getState, info, error, notice, saveState, setOutput, setFailed } from "@actions/core";
 import { restoreCache, saveCache } from "@actions/cache";
 import Dockerode from "dockerode";
+import { execBashCommand } from "./cmd-line";
 
 const CACHE_HIT = "cache-hit";
 const DOCKER_IMAGES_LIST = "docker-images-list";
-const DOCKER_IMAGES_PATH = "~/.docker-images.tar";
+const DOCKER_IMAGES_PATH = `${process.env.HOME}/.docker-images.tar`;
 
 export async function loadDockerImages() : Promise<void> {
     const docker = new Dockerode();
@@ -12,16 +13,19 @@ export async function loadDockerImages() : Promise<void> {
     const restoredKey = await restoreCache([DOCKER_IMAGES_PATH], requestedKey);
     const cacheHit = requestedKey === restoredKey;
 
+    notice(`loadDockerImages: cacheHit=${cacheHit}`);
     setOutput(CACHE_HIT, cacheHit);
     saveState(CACHE_HIT, cacheHit);
 
     if (cacheHit) {
-        info(`Cache hit for key: ${restoredKey}`);
-        docker.loadImage(DOCKER_IMAGES_PATH);
+        info(`Cache hit for key: ${restoredKey}, loading Docker images from cache.`);
+        await execBashCommand(`docker load -i ${DOCKER_IMAGES_PATH}`);
+    } else {
+        info(`Cache miss for key: ${requestedKey}`);
+        const images = await docker.listImages();
+        notice(`Found ${images.length} Docker images.`);
+        saveState(DOCKER_IMAGES_LIST, images);
     }
-
-    const images = await docker.listImages();
-    saveState(DOCKER_IMAGES_LIST, JSON.stringify(images));
 }
 
 export async function saveDockerImages() : Promise<void> {
@@ -30,6 +34,7 @@ export async function saveDockerImages() : Promise<void> {
     const readOnly = getInput("read-only") === "true";
     const key = getInput("key", { required: true });
 
+    notice(`saveDockerImages: cacheHit=${cacheHit}, readOnly=${readOnly}, key=${key}`);
     if (cacheHit) {
         info(`Cache hit occurred for key: ${key}, skipping save.`);
     } else if (readOnly) {
@@ -44,8 +49,16 @@ export async function saveDockerImages() : Promise<void> {
         });
 
         if (newImages.length === 0) {
-            info(`No new Docker images to save for key: ${key}.`);
+            notice(`No new Docker images to save for key: ${key}.`);
             return;
+        }
+        try {
+            const imagesToSave = newImages.map(image => image.RepoTags ? image.RepoTags[0] : image.Id);
+            await execBashCommand(`docker save -o ${DOCKER_IMAGES_PATH} ${imagesToSave.join(" ")}`);
+
+            await saveCache([DOCKER_IMAGES_PATH], key);
+        } catch (err) {
+            setFailed(`Failed to save Docker images to cache: ${err}`);
         }
     }
 }
